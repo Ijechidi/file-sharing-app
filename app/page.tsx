@@ -4,35 +4,38 @@ import { Upload, Download, Share2 } from 'lucide-react'
 
 export default function Home() {
   return (
-    <main className="min-h-[100vh] bg-[#F8F9FB]">
+    <main className="min-h-[100vh] bg-[#003366] overflow-x-hidden">
       <nav className="py-[2rem]">
-        <div className="max-w-[72rem] mx-auto flex justify-between items-center">
-          <h2 className="text-white text-[1.5rem] font-[600] -ml-[6rem]">FileShare </h2>
-          <div className="flex items-center gap-[6rem] mr-[-6rem]">
-            <button className="bg-[#E91E63] text-white px-[2rem] py-[0.6rem] rounded-[9999px] text-[1rem] 
-              hover:bg-[#E91E63]/80 hover:scale-[1.05] transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#E91E63]">
+        <div className="max-w-[72rem] mx-auto flex justify-between items-center px-4 md:px-0">
+          <h2 className="text-[#F8F9FB] text-[1.3rem] md:text-[1.5rem] font-[600] ml-[2rem] md:-ml-[6rem]">FileShare </h2>
+          <div className="flex items-center gap-[16] md:gap-[8rem] mr-0 md:mr-[-6rem]">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#E91E63] text-[#F8F9FB] px-[1rem] md:px-[2rem] py-[0.6rem] rounded-[9999px] text-[0.9rem] md:text-[1rem] 
+                hover:bg-[#E91E63]/80 transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#E91E63]"
+            >
               Login
-            </button>
-            <button className="bg-[#FFC107] text-[#222222] px-[2rem] py-[0.6rem] rounded-[9999px] text-[1rem]
-              hover:bg-[#FFC107]/80 hover:scale-[1.05] transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#FFC107]">
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#FFC107] text-[#F8F9FB] px-[1rem] mr-[2rem] md:px-[2rem] py-[0.6rem] rounded-[9999px] text-[0.9rem] md:text-[1rem]
+                hover:bg-[#FFC107]/80 transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#FFC107]"
+            >
               Sign Up
-            </button>
+            </motion.button>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-[72rem] mx-auto px-[1rem]">
-        <div className="grid md:grid-cols-[repeat(2,1fr)] gap-[3rem] items-center py-[4rem]">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center text-center"
-          >
-            <h1 className="text-[3rem] font-bold text-[#222222] mb-6">
+      <div className="max-w-[72rem] mx-auto px-4 md:px-[1rem] bg-[#F8F9FB] rounded-[1rem] md:rounded-[2rem] mt-[2rem] shadow-lg mb-[2rem] md:mb-[4rem]">
+        <div className="grid md:grid-cols-[repeat(2,1fr)] gap-[2rem] md:gap-[3rem] items-center py-[2rem] md:py-[4rem] border-b border-[#22222210]">
+          <motion.div className="flex flex-col items-center text-center">
+            <h1 className="text-[2rem] md:text-[3rem] font-bold text-[#222222] mb-4 md:mb-6">
               Secure File Sharing Made Simple
             </h1>
-            <p className="text-[#757575] text-[1.125rem] mb-[3rem] max-w-lg">
+            <p className="text-[1rem] md:text-[1.125rem] mb-[2rem] md:mb-[3rem] max-w-lg px-4 md:px-0">
               Share your files securely with anyone, anywhere. Fast, reliable, and encrypted file transfers at your fingertips.
             </p>
             <motion.button
@@ -53,7 +56,6 @@ export default function Home() {
             <h2 className="font-bold text-[#222222] text-[3rem]">
               How It Works
             </h2>
-            
           </div>
           <div className="grid md:grid-cols-[repeat(3,1fr)] gap-[2rem] max-w-[64rem] mx-auto">
             <motion.div 
@@ -93,7 +95,11 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
+        
       </div>
+
+      <div className="bg-[#003366] h-[2rem] md:h-[4rem]"></div>
+    
     </main>
   )
 }
