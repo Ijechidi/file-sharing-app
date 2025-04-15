@@ -1,7 +1,6 @@
 "use client";
 import { motion } from 'framer-motion'
 import { Upload, Download, Share2 } from 'lucide-react'
-import Image from 'next/image'
 
 export default function Home() {
   return (
@@ -46,23 +45,10 @@ export default function Home() {
             </motion.button>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="relative h-[400px]"
-          >
-            <Image
-              src="/images/file-sharing.png"
-              alt="File Sharing Illustration"
-              fill
-              className="object-contain"
-              priority
-            />
-          </motion.div>
+         
         </div>
 
-        <div className="py-[4rem] flex flex-col items-center">
+        <div className="py-[2rem] flex flex-col items-center">
           <div className="flex flex-col items-center gap-[0.5rem] mb-[3rem]">
             <h2 className="font-bold text-[#222222] text-[3rem]">
               How It Works
