@@ -1,8 +1,25 @@
-"use client";
+"use client"
+import { useRouter } from 'next/navigation'
+import { supabase } from '../lib/supabase'
+
 import { motion } from 'framer-motion'
 import { Upload, Download, Share2 } from 'lucide-react'
 
 export default function Home() {
+  const router = useRouter()
+
+  const handleStartSharing = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (session) {
+      // User is authenticated, redirect to dashboard
+      router.push('/dashboard')
+    } else {
+      // User is not authenticated, redirect to login
+      router.push('/login')
+    }
+  }
+
   return (
     <main className="min-h-[100vh] bg-[#003366] overflow-x-hidden">
       <nav className="py-[2rem]">
@@ -12,6 +29,7 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/login')}
               className="bg-[#E91E63] text-[#F8F9FB] px-[1rem] md:px-[2rem] py-[0.6rem] rounded-[9999px] text-[0.9rem] md:text-[1rem] 
                 hover:bg-[#E91E63]/80 transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#E91E63]"
             >
@@ -20,6 +38,7 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/signup')}
               className="bg-[#FFC107] text-[#F8F9FB] px-[1rem] mr-[2rem] md:px-[2rem] py-[0.6rem] rounded-[9999px] text-[0.9rem] md:text-[1rem]
                 hover:bg-[#FFC107]/80 transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#FFC107]"
             >
@@ -44,7 +63,12 @@ export default function Home() {
               className="bg-[#FFC107] text-[#222222] px-[2.5rem] py-[1rem] rounded-[9999px] text-[1.125rem] 
                 hover:bg-[#FFC107]/80 transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#FFC107]"
             >
-              Start Sharing Now
+              <button 
+                onClick={handleStartSharing}
+                
+              >
+                Start Sharing Now
+              </button>
             </motion.button>
           </motion.div>
 
@@ -99,7 +123,8 @@ export default function Home() {
       </div>
 
       <div className="bg-[#003366] h-[2rem] md:h-[4rem]"></div>
-    
+
+      
     </main>
   )
 }
