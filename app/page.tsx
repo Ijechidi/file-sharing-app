@@ -60,15 +60,11 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleStartSharing}
               className="bg-[#FFC107] text-[#222222] px-[2.5rem] py-[1rem] rounded-[9999px] text-[1.125rem] 
                 hover:bg-[#FFC107]/80 transition-all duration-[200ms] border-[2px] border-transparent hover:border-[#FFC107]"
             >
-              <button 
-                onClick={handleStartSharing}
-                
-              >
-                Start Sharing Now
-              </button>
+              Start Sharing Now
             </motion.button>
           </motion.div>
 

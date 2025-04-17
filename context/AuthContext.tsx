@@ -11,7 +11,7 @@ const AuthContext = createContext<{
 }>({
   user: null,
   signIn: async () => {},
-  signUp: async () => {},
+  signUp: async () => {} ,
   signOut: async () => {},
 })
 
