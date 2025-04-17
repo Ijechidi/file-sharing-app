@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { motion } from 'framer-motion'
+
 import { Upload, Download, Share2, Trash2, Search, Filter, FolderOpen, Clock, Star } from 'lucide-react'
 
 interface FileItem {
@@ -60,26 +60,26 @@ export default function Dashboard() {
   }, [user])
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB]">
-      <nav className="bg-white border-b border-gray-100">
+    <div className="min-h-screen bg-[#FAFAFA]">
+      <nav className="bg-white border-b border-[#E0E7FF]">
         <div className="max-w-[72rem] mx-auto px-[2rem] py-[1.25rem] flex items-center justify-between">
-          <h1 className="text-[1.5rem] font-bold text-[#1a1a1a]">Dashboard</h1>
+          <h1 className="text-[1.5rem] font-bold text-[#00A4CC]">Dashboard</h1>
           <div className="flex items-center gap-4">
-            <span className="text-[#666] text-sm">{user?.email}</span>
+            <span className="text-[#4B5563] text-sm font-medium">{user?.email}</span>
           </div>
         </div>
       </nav>
 
       <div className="max-w-[72rem] mx-auto px-[2rem] py-[2rem]">
         {/* Tabs Navigation */}
-        <div className="bg-white rounded-[1rem] shadow-sm mb-[2rem]">
+        <div className="bg-white rounded-xl shadow-sm border border-[#E0E7FF]">
           <nav className="flex justify-between px-[2rem] py-[0.5rem]">
             <button
               onClick={() => setActiveTab('myFiles')}
               className={`${
                 activeTab === 'myFiles'
-                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
-                  : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
+                  ? 'border-[#00A4CC] text-[#00A4CC] bg-[#EEF2FF]'
+                  : 'border-transparent text-[#6B7280] hover:text-[#00A4CC] hover:bg-[#F5F7FF]'
               } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
               <FolderOpen className="w-[1.25rem] h-[1.25rem] mr-3" />
@@ -90,7 +90,7 @@ export default function Dashboard() {
               onClick={() => setActiveTab('shared')}
               className={`${
                 activeTab === 'shared'
-                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  ? 'border-[#00A4CC] text-[#00A4CC] bg-blue-50'
                   : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
               } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
@@ -102,7 +102,7 @@ export default function Dashboard() {
               onClick={() => setActiveTab('recent')}
               className={`${
                 activeTab === 'recent'
-                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  ? 'border-[#00A4CC] text-[#00A4CC] bg-blue-50'
                   : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
               } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
@@ -114,7 +114,7 @@ export default function Dashboard() {
               onClick={() => setActiveTab('starred')}
               className={`${
                 activeTab === 'starred'
-                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  ? 'border-[#00A4CC] text-[#00A4CC] bg-blue-50'
                   : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
               } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
@@ -124,88 +124,54 @@ export default function Dashboard() {
           </nav>
         </div>
 
-        {activeTab === 'myFiles' && (
-          <>
-            {/* Search Bar */}
-            <div className="flex items-center gap-4 mb-[2rem]">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#666] w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search files..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-[0.875rem] rounded-[0.75rem] border border-gray-200 
-                    focus:border-[#2563eb] focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                />
-              </div>
-              <button className="flex items-center gap-2 px-4 py-[0.875rem] rounded-[0.75rem] 
-                border border-gray-200 hover:border-[#2563eb] hover:bg-blue-50 transition-all">
-                <Filter className="w-5 h-5 text-[#666]" />
-                <span className="text-[#1a1a1a]">Filter</span>
-              </button>
-            </div>
-
-            {/* Upload Section */}
-            <div className="bg-white rounded-[1rem] p-[2rem] shadow-sm mb-[2rem] border border-gray-100">
-              <div className="border-2 border-dashed border-gray-200 rounded-[0.75rem] p-[2rem] 
-                hover:border-[#2563eb] hover:bg-blue-50 transition-all">
-                <input
-                  type="file"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="fileInput"
-                  disabled={uploading}
-                />
-                <label
-                  htmlFor="fileInput"
-                  className="cursor-pointer flex flex-col items-center"
-                >
-                  <Upload className="w-12 h-12 text-[#2563eb] mb-4" />
-                  <h3 className="text-xl font-semibold mb-2 text-[#1a1a1a]">Upload Files</h3>
-                  <p className="text-[#666]">Drag and drop files here or click to browse</p>
-                </label>
-              </div>
-            </div>
-
-            {/* Files List */}
-            <div className="bg-white rounded-[1rem] p-[2rem] shadow-sm border border-gray-100">
-              <h2 className="text-[1.25rem] font-semibold mb-6 text-[#1a1a1a]">Your Files</h2>
-              <div className="space-y-3">
-                {files.map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center justify-between p-4 rounded-[0.75rem] border border-gray-100 
-                      hover:border-[#2563eb] hover:bg-blue-50 transition-all"
-                  >
-                    {/* ... contenu du fichier ... */}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-        
-        {activeTab === 'shared' && (
-          <div className="bg-white rounded-[2rem] p-[2rem] shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6">Shared with me</h2>
-            {/* Shared files content */}
+        {/* Search Bar */}
+        <div className="flex items-center gap-4 mb-[2rem] mt-[2rem]">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search files..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-[0.875rem] rounded-xl border border-[#E0E7FF] 
+                focus:border-[#00A4CC] focus:ring-2 focus:ring-[#E0E7FF] outline-none transition-all
+                text-[#374151] placeholder-[#9CA3AF]"
+            />
           </div>
-        )}
+          <button className="flex items-center gap-2 px-4 py-[0.875rem] rounded-xl 
+            bg-white border border-[#E0E7FF] hover:border-[#00A4CC] hover:bg-[#F5F7FF] transition-all">
+            <Filter className="w-5 h-5 text-[#6B7280]" />
+            <span className="text-[#374151] font-medium">Filter</span>
+          </button>
+        </div>
 
-        {activeTab === 'recent' && (
-          <div className="bg-white rounded-[2rem] p-[2rem] shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6">Recent Files</h2>
-            {/* Recent files content */}
+        {/* Upload Section */}
+        <div className="bg-white rounded-xl p-[2rem] shadow-sm border border-[#E0E7FF] mb-[2rem]">
+          <div className="border-2 border-dashed border-[#E0E7FF] rounded-xl p-[2rem] 
+            hover:border-[#00A4CC] hover:bg-[#F5F7FF] transition-all group">
+            <label htmlFor="fileInput" className="cursor-pointer flex flex-col items-center">
+              <Upload className="w-12 h-12 text-[#00A4CC] mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-xl font-semibold mb-2 text-[#111827]">Upload Files</h3>
+              <p className="text-[#6B7280]">Drag and drop files here or click to browse</p>
+            </label>
           </div>
-        )}
+        </div>
 
-        {activeTab === 'starred' && (
-          <div className="bg-white rounded-[2rem] p-[2rem] shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6">Starred Files</h2>
-            {/* Starred files content */}
+        {/* Files List */}
+        <div className="bg-white rounded-xl p-[2rem] shadow-sm border border-[#E0E7FF]">
+          <h2 className="text-[1.25rem] font-semibold mb-6 text-[#111827]">Your Files</h2>
+          <div className="space-y-3">
+            {files.map((file) => (
+              <div
+                key={file.id}
+                className="flex items-center justify-between p-4 rounded-xl border border-[#E0E7FF] 
+                  hover:border-[#00A4CC] hover:bg-[#F5F7FF] transition-all group"
+              >
+                {/* ... contenu du fichier ... */}
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

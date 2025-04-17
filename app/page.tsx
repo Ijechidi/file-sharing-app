@@ -21,10 +21,10 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-[100vh] bg-[#003366] overflow-x-hidden">
+    <main className="min-h-[100vh] bg-[#EAEAEA] overflow-x-hidden">
       <nav className="py-[2rem]">
         <div className="max-w-[72rem] mx-auto flex justify-between items-center px-4 md:px-0">
-          <h2 className="text-[#F8F9FB] text-[1.3rem] md:text-[1.5rem] font-[600] ml-[2rem] md:-ml-[6rem]">FileShare </h2>
+          <h2 className="text-[#00A4CC] text-[1.3rem] md:text-[1.5rem] font-[600] ml-[2rem] md:-ml-[6rem]">FileShare </h2>
           <div className="flex items-center gap-[16] md:gap-[8rem] mr-0 md:mr-[-6rem]">
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -118,7 +118,7 @@ export default function Home() {
         
       </div>
 
-      <div className="bg-[#003366] h-[2rem] md:h-[4rem]"></div>
+      <div className="bg-[#EAEAEA] h-[2rem] md:h-[4rem]"></div>
 
       
     </main>

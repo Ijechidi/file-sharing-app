@@ -1,8 +1,9 @@
-@import "tailwindcss/preflight";
+@tailwind base;
+@tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-primary: #003366;
+  --color-primary: #EAEAEA;
   --color-accent: #00A4CC;
   --color-button-primary: #FFC107;
   --color-button-secondary: #E91E63;
@@ -10,8 +11,6 @@
   --color-bg-secondary: #FFFFFF;
   --color-text-primary: #222222;
   --color-text-secondary: #757575;
-
-  
 }
 
 @layer base {
