@@ -1,13 +1,22 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { Upload, Share2, Trash2, FolderOpen, Clock, Star, Users } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Upload, Download, Share2, Trash2, Search, Filter, FolderOpen, Clock, Star } from 'lucide-react'
+
+interface FileItem {
+  name: string
+  size: number
+  created_at: string
+  id: string
+}
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const [files, setFiles] = useState([])
+  const [files, setFiles] = useState<FileItem[]>([])
   const [uploading, setUploading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('myFiles')
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +30,9 @@ export default function Dashboard() {
         .upload(`${user?.id}/${file.name}`, file)
 
       if (error) throw error
+      
+      // Refresh files list after upload
+      fetchFiles()
     } catch (error) {
       alert('Error uploading file')
     } finally {
@@ -28,81 +40,49 @@ export default function Dashboard() {
     }
   }
 
-  const renderContent = () => {
-    switch(activeTab) {
-      case 'myFiles':
-        return (
-          <div className="space-y-6">
-            {/* Upload Section */}
-            <div className="p-6 bg-white rounded-lg shadow">
-              <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-10 h-10 mb-3 text-gray-400" />
-                    <p className="mb-2 text-sm text-gray-500">
-                      <span className="font-semibold">Click to upload</span> or drag and drop
-                    </p>
-                  </div>
-                  <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploading} />
-                </label>
-              </div>
-            </div>
+  const fetchFiles = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('files')
+        .list(`${user?.id}/`)
 
-            {/* Files List */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">My Files</h3>
-              {/* Files list will go here */}
-            </div>
-          </div>
-        )
-      case 'shared':
-        return (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Shared with me</h3>
-            {/* Shared files list */}
-          </div>
-        )
-      case 'recent':
-        return (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Files</h3>
-            {/* Recent files list */}
-          </div>
-        )
-      case 'starred':
-        return (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Starred Files</h3>
-            {/* Starred files list */}
-          </div>
-        )
-      default:
-        return null
+      if (error) throw error
+      setFiles(data || [])
+    } catch (error) {
+      console.error('Error fetching files:', error)
     }
   }
 
+  useEffect(() => {
+    if (user) {
+      fetchFiles()
+    }
+  }, [user])
+
   return (
     <div className="min-h-screen bg-[#F8F9FB]">
-      {/* Navigation */}
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <h1 className="text-2xl font-bold text-[#222222]">Dashboard</h1>
+      <nav className="bg-white border-b border-gray-100">
+        <div className="max-w-[72rem] mx-auto px-[2rem] py-[1.25rem] flex items-center justify-between">
+          <h1 className="text-[1.5rem] font-bold text-[#1a1a1a]">Dashboard</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-[#666] text-sm">{user?.email}</span>
+          </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+      <div className="max-w-[72rem] mx-auto px-[2rem] py-[2rem]">
+        {/* Tabs Navigation */}
+        <div className="bg-white rounded-[1rem] shadow-sm mb-[2rem]">
+          <nav className="flex justify-between px-[2rem] py-[0.5rem]">
             <button
               onClick={() => setActiveTab('myFiles')}
               className={`${
                 activeTab === 'myFiles'
-                  ? 'border-[#E91E63] text-[#222222]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } flex items-center whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
+              } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
-              <FolderOpen className="w-5 h-5 mr-2" />
+              <FolderOpen className="w-[1.25rem] h-[1.25rem] mr-3" />
               My Files
             </button>
 
@@ -110,11 +90,11 @@ export default function Dashboard() {
               onClick={() => setActiveTab('shared')}
               className={`${
                 activeTab === 'shared'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } flex items-center whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
+              } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
-              <Users className="w-5 h-5 mr-2" />
+              <Share2 className="w-[1.25rem] h-[1.25rem] mr-3" />
               Shared with me
             </button>
 
@@ -122,11 +102,11 @@ export default function Dashboard() {
               onClick={() => setActiveTab('recent')}
               className={`${
                 activeTab === 'recent'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } flex items-center whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
+              } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
-              <Clock className="w-5 h-5 mr-2" />
+              <Clock className="w-[1.25rem] h-[1.25rem] mr-3" />
               Recent
             </button>
 
@@ -134,18 +114,98 @@ export default function Dashboard() {
               onClick={() => setActiveTab('starred')}
               className={`${
                 activeTab === 'starred'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } flex items-center whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  ? 'border-[#2563eb] text-[#2563eb] bg-blue-50'
+                  : 'border-transparent text-[#666] hover:text-[#1a1a1a] hover:bg-gray-50'
+              } flex items-center py-[1rem] px-[2rem] border-b-2 font-medium text-[0.95rem] rounded-t-lg transition-all`}
             >
-              <Star className="w-5 h-5 mr-2" />
+              <Star className="w-[1.25rem] h-[1.25rem] mr-3" />
               Starred
             </button>
           </nav>
         </div>
 
-        {/* Content */}
-        {renderContent()}
+        {activeTab === 'myFiles' && (
+          <>
+            {/* Search Bar */}
+            <div className="flex items-center gap-4 mb-[2rem]">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#666] w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search files..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-[0.875rem] rounded-[0.75rem] border border-gray-200 
+                    focus:border-[#2563eb] focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                />
+              </div>
+              <button className="flex items-center gap-2 px-4 py-[0.875rem] rounded-[0.75rem] 
+                border border-gray-200 hover:border-[#2563eb] hover:bg-blue-50 transition-all">
+                <Filter className="w-5 h-5 text-[#666]" />
+                <span className="text-[#1a1a1a]">Filter</span>
+              </button>
+            </div>
+
+            {/* Upload Section */}
+            <div className="bg-white rounded-[1rem] p-[2rem] shadow-sm mb-[2rem] border border-gray-100">
+              <div className="border-2 border-dashed border-gray-200 rounded-[0.75rem] p-[2rem] 
+                hover:border-[#2563eb] hover:bg-blue-50 transition-all">
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="fileInput"
+                  disabled={uploading}
+                />
+                <label
+                  htmlFor="fileInput"
+                  className="cursor-pointer flex flex-col items-center"
+                >
+                  <Upload className="w-12 h-12 text-[#2563eb] mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-[#1a1a1a]">Upload Files</h3>
+                  <p className="text-[#666]">Drag and drop files here or click to browse</p>
+                </label>
+              </div>
+            </div>
+
+            {/* Files List */}
+            <div className="bg-white rounded-[1rem] p-[2rem] shadow-sm border border-gray-100">
+              <h2 className="text-[1.25rem] font-semibold mb-6 text-[#1a1a1a]">Your Files</h2>
+              <div className="space-y-3">
+                {files.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between p-4 rounded-[0.75rem] border border-gray-100 
+                      hover:border-[#2563eb] hover:bg-blue-50 transition-all"
+                  >
+                    {/* ... contenu du fichier ... */}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+        
+        {activeTab === 'shared' && (
+          <div className="bg-white rounded-[2rem] p-[2rem] shadow-lg">
+            <h2 className="text-2xl font-semibold mb-6">Shared with me</h2>
+            {/* Shared files content */}
+          </div>
+        )}
+
+        {activeTab === 'recent' && (
+          <div className="bg-white rounded-[2rem] p-[2rem] shadow-lg">
+            <h2 className="text-2xl font-semibold mb-6">Recent Files</h2>
+            {/* Recent files content */}
+          </div>
+        )}
+
+        {activeTab === 'starred' && (
+          <div className="bg-white rounded-[2rem] p-[2rem] shadow-lg">
+            <h2 className="text-2xl font-semibold mb-6">Starred Files</h2>
+            {/* Starred files content */}
+          </div>
+        )}
       </div>
     </div>
   )
