@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
 
 import { Upload, Download, Share2, Trash2, Search, Filter, FolderOpen, Clock, Star } from 'lucide-react'
+import { FileDetails } from '../../types/file'
+import { formatFileSize, getFileTypeIcon } from '../../lib/fileUtils'
 
 interface FileItem {
   name: string
@@ -25,29 +27,60 @@ export default function Dashboard() {
       const file = e.target.files?.[0]
       if (!file) return
 
-      const { data, error } = await supabase.storage
-        .from('files')
-        .upload(`${user?.id}/${file.name}`, file)
+      console.log('Uploading file:', file.name, 'Size:', file.size)
+      console.log('User ID:', user?.id)
 
-      if (error) throw error
+      // Upload to storage
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('files')
+        .upload(`${user?.id}/${file.name}`, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (storageError) {
+        console.error('Storage error:', storageError.message)
+        throw storageError
+      }
+
+      console.log('Storage success:', storageData)
+
+      // Create file record in database
+      const { error: dbError } = await supabase
+        .from('files')
+        .insert({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          path: `${user?.id}/${file.name}`,
+          owner_id: user?.id
+        })
+
+      if (dbError) {
+        console.error('Database error:', dbError.message)
+        throw dbError
+      }
       
-      // Refresh files list after upload
+      // Refresh files list
       fetchFiles()
-    } catch (error) {
-      alert('Error uploading file')
+    } catch (error: any) {
+      console.error('Detailed error:', error.message)
+      alert(`Error uploading file: ${error.message}`)
     } finally {
       setUploading(false)
     }
-  }
+}
 
   const fetchFiles = async () => {
     try {
-      const { data, error } = await supabase.storage
+      const { data: filesData, error } = await supabase
         .from('files')
-        .list(`${user?.id}/`)
+        .select('*')
+        .eq('owner_id', user?.id)
+        .order('created_at', { ascending: false })
 
       if (error) throw error
-      setFiles(data || [])
+      setFiles(filesData || [])
     } catch (error) {
       console.error('Error fetching files:', error)
     }
@@ -62,7 +95,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <nav className="bg-white border-b border-[#E0E7FF]">
-        <div className="max-w-[72rem] mx-auto px-[2rem] py-[1.25rem] flex items-center justify-between">
+        <div className="max-w-[72rem] mx-auto px-[2rem] py-[1.25rem]  flex items-center justify-between">
           <h1 className="text-[1.5rem] font-bold text-[#00A4CC]">Dashboard</h1>
           <div className="flex items-center gap-4">
             <span className="text-[#4B5563] text-sm font-medium">{user?.email}</span>
@@ -150,8 +183,16 @@ export default function Dashboard() {
           <div className="border-2 border-dashed border-[#E0E7FF] rounded-xl p-[2rem] 
             hover:border-[#00A4CC] hover:bg-[#F5F7FF] transition-all group">
             <label htmlFor="fileInput" className="cursor-pointer flex flex-col items-center">
+              <input
+                id="fileInput"
+                type="file"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
               <Upload className="w-12 h-12 text-[#00A4CC] mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-semibold mb-2 text-[#111827]">Upload Files</h3>
+              <h3 className="text-xl font-semibold mb-2 text-[#111827]">
+                {uploading ? 'Uploading...' : 'Upload Files'}
+              </h3>
               <p className="text-[#6B7280]">Drag and drop files here or click to browse</p>
             </label>
           </div>
@@ -167,7 +208,31 @@ export default function Dashboard() {
                 className="flex items-center justify-between p-4 rounded-xl border border-[#E0E7FF] 
                   hover:border-[#00A4CC] hover:bg-[#F5F7FF] transition-all group"
               >
-                {/* ... contenu du fichier ... */}
+                <div className="flex items-center gap-4">
+                  <div className="p-2 rounded-lg bg-[#F5F7FF] group-hover:bg-white transition-colors">
+                    {/* Icône basée sur le type de fichier */}
+                  </div>
+                  <div>
+                    <h3 className="text-[#111827] font-medium">{file.name}</h3>
+                    <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+                      <span>{formatFileSize(file.size)}</span>
+                      <span>•</span>
+                      <span>{new Date(file.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <button className="p-2 rounded-lg hover:bg-[#F5F7FF] transition-colors">
+                    <Share2 className="w-5 h-5 text-[#6B7280]" />
+                  </button>
+                  <button className="p-2 rounded-lg hover:bg-[#F5F7FF] transition-colors">
+                    <Download className="w-5 h-5 text-[#6B7280]" />
+                  </button>
+                  <button className="p-2 rounded-lg hover:bg-[#F5F7FF] transition-colors">
+                    <Trash2 className="w-5 h-5 text-[#6B7280]" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
